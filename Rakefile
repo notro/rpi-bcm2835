@@ -66,7 +66,7 @@ end
 release 'rpi-bcm2835' => [:issue106, :raspberrypi_tools, :raspberrypi_firmware, :uboot_bcm2835, :rpi_bcm2835_linux] do
 
 # download problems, use locally cached version
-VAR['UBOOT_REF'] = '0a26e1d6c394aacbf1153977b7348d1dff85db3f'
+#VAR['UBOOT_REF'] = '0a26e1d6c394aacbf1153977b7348d1dff85db3f'
 
   VAR['KERNEL_ORG_VERSION'] ||= kernelorg_linux_latest
   info "KERNEL_ORG_VERSION = #{VAR['KERNEL_ORG_VERSION']}"
