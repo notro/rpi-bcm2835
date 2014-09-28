@@ -1,0 +1,58 @@
+From 29de0a1d6aa439325468b7b57191a77dc678478f Mon Sep 17 00:00:00 2001
+From: Jassi Brar <jaswinder.singh@linaro.org>
+Date: Tue, 22 Jul 2014 20:40:04 +0530
+Subject: dt: mailbox: add generic bindings
+
+Define generic bindings for the framework clients to
+request mailbox channels.
+
+Signed-off-by: Jassi Brar <jaswinder.singh@linaro.org>
+Reviewed-by: Mark Brown <broonie@linaro.org>
+
+diff --git a/Documentation/devicetree/bindings/mailbox/mailbox.txt b/Documentation/devicetree/bindings/mailbox/mailbox.txt
+new file mode 100644
+index 0000000..1a2cd3d
+--- /dev/null
++++ b/Documentation/devicetree/bindings/mailbox/mailbox.txt
+@@ -0,0 +1,38 @@
++* Generic Mailbox Controller and client driver bindings
++
++Generic binding to provide a way for Mailbox controller drivers to
++assign appropriate mailbox channel to client drivers.
++
++* Mailbox Controller
++
++Required property:
++- #mbox-cells: Must be at least 1. Number of cells in a mailbox
++		specifier.
++
++Example:
++	mailbox: mailbox {
++		...
++		#mbox-cells = <1>;
++	};
++
++
++* Mailbox Client
++
++Required property:
++- mboxes: List of phandle and mailbox channel specifiers.
++
++Optional property:
++- mbox-names: List of identifier strings for each mailbox channel
++		required by the client. The use of this property
++		is discouraged in favor of using index in list of
++		'mboxes' while requesting a mailbox. Instead the
++		platforms may define channel indices, in DT headers,
++		to something legible.
++
++Example:
++	pwr_cntrl: power {
++		...
++		mbox-names = "pwr-ctrl", "rpc";
++		mboxes = <&mailbox 0
++			&mailbox 1>;
++	};
+-- 
+cgit v0.10.1
+

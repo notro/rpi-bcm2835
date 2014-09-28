@@ -1,4 +1,4 @@
 rpi-bcm2835
 ===========
 
-Build ARCH_BCM2835 Linux kernel with latest patches
+See [wiki](https://github.com/notro/rpi-bcm2835/wiki)
