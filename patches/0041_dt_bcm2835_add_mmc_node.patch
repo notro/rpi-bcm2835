@@ -1,0 +1,67 @@
+From eae5c29797a06e0ec77146a8e18952c0352ca930 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Piotr=20Kr=C3=B3l?= <piotr.krol@3mdeb.com>
+Date: Mon, 6 Oct 2014 22:41:28 +0200
+Subject: [PATCH] dt: bcm2835: add mmc node
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Add MMC node, increase clk_mmc frequency and use bcm2835-mmc instead of
+bcm2835-sdhci
+
+Based on Noralf Tronnes code
+https://github.com/notro/rpi-bcm2835/blob/3af7ed5b12d436829c4286baab94e68c93b2319d/Rakefile
+
+Signed-off-by: Piotr Król <piotr.krol@3mdeb.com>
+---
+ arch/arm/boot/dts/bcm2835-rpi-b.dts |  2 +-
+ arch/arm/boot/dts/bcm2835.dtsi      | 13 ++++++++++++-
+ 2 files changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/boot/dts/bcm2835-rpi-b.dts b/arch/arm/boot/dts/bcm2835-rpi-b.dts
+index 2a3b1c1313a0..f64bc6364e44 100644
+--- a/arch/arm/boot/dts/bcm2835-rpi-b.dts
++++ b/arch/arm/boot/dts/bcm2835-rpi-b.dts
+@@ -51,7 +51,7 @@
+ 	clock-frequency = <100000>;
+ };
+ 
+-&sdhci {
++&mmc {
+ 	status = "okay";
+ 	bus-width = <4>;
+ };
+diff --git a/arch/arm/boot/dts/bcm2835.dtsi b/arch/arm/boot/dts/bcm2835.dtsi
+index b8473c43e888..50f63336cec0 100644
+--- a/arch/arm/boot/dts/bcm2835.dtsi
++++ b/arch/arm/boot/dts/bcm2835.dtsi
+@@ -43,6 +43,17 @@
+ 			brcm,dma-channel-mask = <0x7f35>;
+ 		};
+ 
++		mmc: mmc@7e300000 {
++			compatible = "brcm,bcm2835-mmc";
++			reg = <0x7e300000 0x100>;
++			interrupts = <2 30>;
++			clocks = <&clk_mmc>;
++			dmas = <&dma 5>,
++			<&dma 5>;
++			dma-names = "tx", "rx";
++			status = "disabled";
++		};
++
+ 		intc: interrupt-controller@7e00b200 {
+ 			compatible = "brcm,bcm2835-armctrl-ic";
+ 			reg = <0x7e00b200 0x200>;
+@@ -160,7 +171,7 @@
+ 			reg = <0>;
+ 			#clock-cells = <0>;
+ 			clock-output-names = "mmc";
+-			clock-frequency = <100000000>;
++			clock-frequency = <250000000>;
+ 		};
+ 
+ 		clk_i2c: clock@1 {
+-- 
+2.1.0
+

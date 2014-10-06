@@ -35,29 +35,7 @@ package :rpi_bcm2835_linux => :kernelorg_linux do
   #config 'MMC_BCM2835_PIO_DMA_BARRIER', :val, 2
 
   # bcm2835-mmc Device Tree node
-  target :patch do
-    insert_before workdir('linux/arch/arm/boot/dts/bcm2835.dtsi'), "		intc:", <<EOM
-		mmc: mmc@7e300000 {
-			compatible = "brcm,bcm2835-mmc";
-			reg = <0x7e300000 0x100>;
-			interrupts = <2 30>;
-			clocks = <&clk_mmc>;
-			dmas = <&dma 5>,
-			<&dma 5>;
-			dma-names = "tx", "rx";
-			status = "disabled";
-		};
-
-EOM
-
-    # change the clock to fit bcm2835-mmc
-    # clk_mmc: clock@10
-    replace workdir('linux/arch/arm/boot/dts/bcm2835.dtsi'), "clock-frequency = <100000000>;", "clock-frequency = <250000000>;"
-
-    # enable bcm2835-mmc instead of bcm2835-sdhci
-    replace workdir('linux/arch/arm/boot/dts/bcm2835-rpi-b.dts'), "&sdhci", "&mmc"
-
-  end
+  patch '0041_dt_bcm2835_add_mmc_node.patch'
 
   #config 'DYNAMIC_DEBUG', :enable
 end
