@@ -5,65 +5,79 @@ require 'stdlib/linux'
 # speed up building by not having to unpack the build tools each time
 #ENV['CROSS_COMPILE'] = '/home/pi/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin/arm-linux-gnueabihf-'
 
-package :rpi_bcm2835_linux => :kernelorg_linux do
-  VAR['LINUX_DEFCONFIG'] = 'bcm2835_defconfig'
+package :rpi_dt_linux do
+  raise "RPI_DT_LINUX_BRANCH is not set" unless VAR['RPI_DT_LINUX_BRANCH']
 
-  # we're not vanilla, but the Makefile can't determine that, so make it explicit
-  target :unpack do
-    File.write workdir('linux/.scmversion'), '+'
+  VAR['RPI_DT_LINUX_REF'] ||= github_get_head('pietrushnic/rpi-dt-linux', VAR['RPI_DT_LINUX_BRANCH'])
+
+  if 1
+    # download source
+    #
+    github_tarball "pietrushnic/rpi-dt-linux", 'linux', 'RPI_DT_LINUX'
+    # we're not vanilla, but the Makefile can't determine that, so make it explicit
+    target :unpack do
+      File.write workdir('linux/.scmversion'), '+'
+    end
+  else
+    # use local git repo in Rakefile directory
+    #
+    # NOT TESTED
+    #
+    target :unpack do
+      ln_s workdir('../rpi-dt-linux'), workdir('linux')
+    end
   end
 
-  # mailbox API
-  patch '0001_mailbox__rename_pl320-ipc_specific_mailbox.h.patch'
-  patch '0002_mailbox__Introduce_framework_for_mailbox.patch'
-  patch '0003_doc__add_documentation_for_mailbox_framework.patch'
-  patch '0004_dt__mailbox__add_generic_bindings.patch'
-
-  # mailbox driver
-  #patch '0010_'
-
-  patch '0020_ARM__bcm2835__Enable_USB_DWC2_HOST_in_bcm2835_defconfig.patch'
-
-#  # bcm2835-dma slave_sg patch
-#  # patch '0030_'
-#  config 'DMADEVICES', :enable
-#  config 'DMA_BCM2835', :enable
-
-  patch '0040_MMC__added_alternative_MMC_driver.patch'
   config 'MMC_BCM2835', :enable
-  #config 'MMC_BCM2835_DMA', :enable
-  #config 'MMC_BCM2835_PIO_DMA_BARRIER', :val, 2
 
-  # bcm2835-mmc Device Tree node
-  patch '0041_dt_bcm2835_add_mmc_node.patch'
+  ENV['LINUX_DEFCONFIG'] ||= 'bcm2835_defconfig'
+  config ['CONFIG_IKCONFIG', 'CONFIG_IKCONFIG_PROC'], :enable
+  config 'PROC_DEVICETREE', :enable
 
-  #config 'DYNAMIC_DEBUG', :enable
+  target :kbuild do
+    post_install <<EOM
+cp "${FW_REPOLOCAL}/zImage" "${FW_PATH}/"
+
+EOM
+	end
+
+  target :build do
+    dst = workdir 'out'
+    ksrc = workdir 'linux'
+    msrc = workdir 'modules'
+
+    cp(ksrc + "/arch/arm/boot/zImage", dst)
+    sh "cp #{ksrc}/arch/arm/boot/dts/*.dtb #{dst}"
+    mkdir_p(dst + "/modules")
+    sh "cp -r #{msrc}/lib/modules/* #{dst}/modules/" unless FileList["#{msrc}/lib/modules/*"].empty?
+    sh "cp -r #{msrc}/lib/firmware #{dst}/" unless FileList["#{msrc}/lib/firmware/*"].empty?
+    cp(ksrc + "/Module.symvers", dst)
+    mkdir_p(dst + "/extra")
+    cp(ksrc + "/System.map", dst + "/extra/")
+    cp(ksrc + "/.config", dst + "/extra/")
+  end
 end
 
 
-release 'rpi-bcm2835' => [:issue106, :raspberrypi_tools, :raspberrypi_firmware, :uboot_bcm2835, :rpi_bcm2835_linux] do
+release 'rpi-dt-linux' => [:issue106, :raspberrypi_tools, :raspberrypi_firmware, :uboot_bcm2835, :rpi_dt_linux] do
 
-# download problems, use locally cached version
-#VAR['UBOOT_REF'] = '0a26e1d6c394aacbf1153977b7348d1dff85db3f'
+  VAR['RPI_DT_LINUX_BRANCH'] = 'rpi-3.16.y'
 
-  VAR['KERNEL_ORG_VERSION'] ||= kernelorg_linux_latest
-  info "KERNEL_ORG_VERSION = #{VAR['KERNEL_ORG_VERSION']}"
-
-  VAR['FW_BRANCH'] = 'rpi-bcm2835'
-
-  ENV['COMMIT_MESSAGE'] = "First release (#{VAR['KERNEL_RELEASE']})"
+  ENV['COMMIT_MESSAGE'] = "Second release (#{VAR['KERNEL_RELEASE']})"
   Readme.desc { "Raspberry Pi Linux kernel #{VAR['KERNEL_RELEASE']} (ARCH_BCM2835) with additional patches." }
   Readme.body = """
 
 Changelog
 ---------
+2014-10-12:
+* Rebase to 3.16.5 - second release
+* Built from GitHub repository [rpi-dt-linux](https://github.com/pietrushnic/rpi-dt-linux.git) - `rpi-3.16.y` branch
+
 2014-09-28:
 * First release
 
 Links
 * [Upstreaming](https://github.com/raspberrypi/linux/wiki/Upstreaming)
 * [Device Tree on ARCH_BCM2708](https://github.com/raspberrypi/linux/wiki/Device-Tree-on-ARCH_BCM2708)
-
 """
 end
-
