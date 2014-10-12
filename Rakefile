@@ -10,7 +10,7 @@ package :rpi_dt_linux do
 
   VAR['RPI_DT_LINUX_REF'] ||= github_get_head('pietrushnic/rpi-dt-linux', VAR['RPI_DT_LINUX_BRANCH'])
 
-  if 1
+  if VAR['RPI_DT_LINUX_LOCAL'].nil?
     # download source
     #
     github_tarball "pietrushnic/rpi-dt-linux", 'linux', 'RPI_DT_LINUX'
@@ -24,7 +24,7 @@ package :rpi_dt_linux do
     # NOT TESTED
     #
     target :unpack do
-      ln_s workdir('../rpi-dt-linux'), workdir('linux')
+      ln_s workdir("#{VAR['RPI_DT_LINUX_LOCAL']}"), workdir('linux')
     end
   end
 
