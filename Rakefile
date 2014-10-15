@@ -69,6 +69,9 @@ release 'rpi-dt-linux' => [:issue106, :raspberrypi_tools, :raspberrypi_firmware,
 
 Changelog
 ---------
+2014-10-15:
+* bcm2835-mbox, bcm2835-cpufreq and bcm2835-thermal drivers based on Lubomir Rintel [work](https://github.com/hackerspace/rpi-linux/commits/lr-raspberry-pi-new-mailbox)
+
 2014-10-12:
 * Rebase to 3.16.5 - second release
 * Built from GitHub repository [rpi-dt-linux](https://github.com/pietrushnic/rpi-dt-linux.git) - `rpi-3.16.y` branch
