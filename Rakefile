@@ -63,13 +63,17 @@ release 'rpi-dt-linux' => [:issue106, :raspberrypi_tools, :raspberrypi_firmware,
 
   VAR['RPI_DT_LINUX_BRANCH'] = 'rpi-3.16.y'
 
-  ENV['COMMIT_MESSAGE'] = "Second release (#{VAR['KERNEL_RELEASE']})"
+  ENV['COMMIT_MESSAGE'] = "3.16.y.4 release (#{VAR['KERNEL_RELEASE']})"
   Readme.desc { "Raspberry Pi Linux kernel #{VAR['KERNEL_RELEASE']} (ARCH_BCM2835) with additional patches." }
   Readme.body = """
 
 Changelog
 ---------
 2014-10-15:
+* Rebase to 3.16.6
+
+2014-10-15:
+* Third release
 * bcm2835-mbox, bcm2835-cpufreq and bcm2835-thermal drivers based on Lubomir Rintel [work](https://github.com/hackerspace/rpi-linux/commits/lr-raspberry-pi-new-mailbox)
 
 2014-10-12:
