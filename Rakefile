@@ -29,6 +29,7 @@ package :rpi_dt_linux do
   end
 
   config 'MMC_BCM2835', :enable
+  config 'DMA_BCM2835', :enable
 
   ENV['LINUX_DEFCONFIG'] ||= 'bcm2835_defconfig'
   config ['CONFIG_IKCONFIG', 'CONFIG_IKCONFIG_PROC'], :enable
@@ -63,12 +64,16 @@ release 'rpi-dt-linux' => [:issue106, :raspberrypi_tools, :raspberrypi_firmware,
 
   VAR['RPI_DT_LINUX_BRANCH'] = 'rpi-3.16.y'
 
-  ENV['COMMIT_MESSAGE'] = "3.16.y.4 release (#{VAR['KERNEL_RELEASE']})"
+  ENV['COMMIT_MESSAGE'] = "3.16.y.5 release (#{VAR['KERNEL_RELEASE']})"
   Readme.desc { "Raspberry Pi Linux kernel #{VAR['KERNEL_RELEASE']} (ARCH_BCM2835) with additional patches." }
   Readme.body = """
 
 Changelog
 ---------
+2014-10-21:
+* Fix bcm2835-mbox issues with checking wrong mailbox
+* Enable DMA_BCM2835
+
 2014-10-15:
 * Rebase to 3.16.6
 
