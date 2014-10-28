@@ -28,12 +28,7 @@ package :rpi_dt_linux do
     end
   end
 
-  config 'MMC_BCM2835', :enable
-  config 'DMA_BCM2835', :enable
-
   ENV['LINUX_DEFCONFIG'] ||= 'bcm2835_defconfig'
-  config ['CONFIG_IKCONFIG', 'CONFIG_IKCONFIG_PROC'], :enable
-  config 'PROC_DEVICETREE', :enable
 
   target :kbuild do
     post_install <<EOM
@@ -62,14 +57,21 @@ end
 
 release 'rpi-dt-linux' => [:issue106, :raspberrypi_tools, :raspberrypi_firmware, :uboot_bcm2835, :rpi_dt_linux] do
 
-  VAR['RPI_DT_LINUX_BRANCH'] = 'rpi-3.16.y'
+  VAR['RPI_DT_LINUX_BRANCH'] = 'rpi-3.17.y'
 
-  ENV['COMMIT_MESSAGE'] = "3.16.y.5 release (#{VAR['KERNEL_RELEASE']})"
+  ENV['COMMIT_MESSAGE'] = "3.17.y.1 release (#{VAR['KERNEL_RELEASE']})"
   Readme.desc { "Raspberry Pi Linux kernel #{VAR['KERNEL_RELEASE']} (ARCH_BCM2835) with additional patches." }
   Readme.body = """
 
 Changelog
 ---------
+2014-10-28
+* switch to 3.17.1
+* add slave_sg for bcm2835-dma
+* replace sdhci-bcm2835 with bcm2835-mmc
+* fix issue with bcm2835-cpufreq with incorrect mbox status register in tx_done and send_data
+* move DMA, MMC and IKCONFIG options to bcm2835_defconfig
+
 2014-10-21:
 * Fix bcm2835-mbox issues with checking wrong mailbox
 * Enable DMA_BCM2835
